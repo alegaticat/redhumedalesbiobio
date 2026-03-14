@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiolibro: Humedales Biobío 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .animate-pulse-slow { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.1); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="max-w-md w-full bg-slate-900 rounded-[3rem] shadow-2xl border border-slate-800 overflow-hidden flex flex-col relative min-h-[700px]">
+        <!-- UI cargada vía JavaScript -->
+    </div>
+
+    <script>
+        // CONFIGURACIÓN DE DATOS
+        const apiKey = "AIzaSyCUhhxDU1SqBoZMoUmT41boLq6AEMViGUU";
+        
+        const chapters = [
+            {
+                title: "Resumen Ejecutivo",
+                narrative: "Resumen Ejecutivo. El Cuarto Reporte de Humedales de la Región del Biobío, titulado Humedales en la Línea de Fuego, surge en un momento crítico tras los mega incendios de enero de dos mil veintiséis. Este documento revela que los incendios son transformadores profundos de la hidrología regional. Proponemos el Escudo Azul-Verde como infraestructura de resiliencia crítica.",
+                data: "Métricas del Resumen Ejecutivo. Universo de análisis inicial: noventa y seis registros ciudadanos. Muestra validada: setenta y nueve humedales. Nivel de criticidad: riesgo agravado en el cien por ciento de las cuencas costeras. Proyección: pérdida de regulación hídrica afectará el consumo humano en un período de veinticuatro meses."
+            },
+            {
+                title: "Capítulo 1: Metodología Ciudadana",
+                narrative: "Capítulo Uno. Metodología y Vigilancia Ciudadana. Este reporte utiliza un enfoque de cartografía social para documentar lo que las instituciones suelen ignorar. Las comunidades locales reportaron amenazas en tiempo real, validando que la primera línea de defensa ambiental son los vecinos organizados.",
+                data: "Estadísticas Metodológicas. Amenazas categorizadas: ciento cuarenta y dos. Gobernanza: el sesenta y ocho punto cuatro por ciento de los humedales están bajo cuidado exclusivo de organizaciones comunitarias. Brecha presupuestaria: el noventa por ciento opera con presupuesto cero."
+            },
+            {
+                title: "Capítulo 2: Impacto de Incendios",
+                narrative: "Capítulo Dos. Los Incendios como Eventos Transformadores de Cuenca. Durante el verano de dos mil veintiséis, la Provincia de Concepción sufrió una devastación sin precedentes. La hidrofobicidad post-incendio impide que el suelo absorba agua, enviando torrentes de cenizas hacia los humedales.",
+                data: "Análisis Cuantitativo de Incendios. Superficie afectada en Concepción: veinte mil quinientas hectáreas. Severidad extrema: sesenta y cinco por ciento de la superficie. Escorrentía: incremento del trescientos por ciento en el flujo superficial durante las primeras lluvias."
+            },
+            {
+                title: "Capítulo 3: Radiografía de Amenazas",
+                narrative: "Capítulo Tres. Amenazas y Fragilidad Territorial. Coronel y Talcahuano presentan la mayor densidad de humedales bajo amenaza. El reporte documenta cómo proyectos estatales de vivienda y vialidad ignoran la normativa, construyendo sobre rellenos que aumentan nuestra vulnerabilidad.",
+                data: "Inventario de Amenazas. Coronel: veintiocho humedales críticos. Talcahuano: veinticuatro registros. Contaminación por residuos: ochenta y nueve por ciento de los casos. Incumplimiento legal: cuarenta y cinco por ciento de los humedales protegidos han sufrido intervenciones físicas destructivas."
+            },
+            {
+                title: "Capítulo 4: Gobernanza y Futuro",
+                narrative: "Capítulo Cuatro. Propuestas para la Resiliencia. Es urgente que el Biobío adopte el Escudo Azul-Verde. El gran hito debe ser la acreditación del Gran Concepción como Ciudad Humedal Ramsar, permitiendo coordinar fondos internacionales para la restauración post-incendio.",
+                data: "Indicadores de Gestión. Brecha: el noventa y cuatro por ciento de los humedales declarados carece de un Plan de Manejo aprobado. Eficacia: solo un doce por ciento de denuncias derivan en sanción. Meta Ramsar: acceso potencial a cinco millones de dólares para restauración ecológica."
+            },
+            {
+                title: "Sección Final: Glosario",
+                narrative: "Glosario Técnico. Es vital comprender conceptos como: Hidrofobicidad (suelo que repele el agua), Colmatación (humedales llenos de sedimentos), y el Escudo Azul-Verde, nuestra propuesta para integrar la naturaleza en la planificación urbana.",
+                data: "Definiciones Técnicas. Uno: Hidrofobicidad, repelencia al agua inducida por calor. Dos: Colmatación, acumulación de sólidos que reduce el volumen del humedal. Tres: Resiliencia Ecosistémica, capacidad de recuperar funciones tras un disturbio extremo."
+            }
+        ];
+
+        // ESTADO DE LA APP
+        let currentChapter = 0;
+        let isPlaying = false;
+        let isLoading = false;
+        let readingMode = 'narrative'; // 'narrative' | 'data'
+        let playbackSpeed = 1;
+        let autoNext = true;
+        let audio = new Audio();
+        let showChapters = false;
+
+        // ELEMENTOS UI
+        const appContainer = document.getElementById('app');
+
+        function render() {
+            appContainer.innerHTML = `
+                <!-- HEADER -->
+                <div class="p-8 flex justify-between items-center z-30">
+                    <button onclick="toggleChapters()" class="p-3 rounded-2xl transition-all ${showChapters ? 'bg-emerald-500 text-slate-900 shadow-lg shadow-emerald-500/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">
+                        <i data-lucide="list"></i>
+                    </button>
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold tracking-[0.3em] text-emerald-500 uppercase">Humedales 2026</p>
+                        <p class="text-[10px] font-medium text-slate-500 uppercase">Capítulo ${currentChapter + 1} de ${chapters.length}</p>
+                    </div>
+                    <div class="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
+                        <button onclick="setMode('narrative')" class="px-3 py-1.5 rounded-xl transition-all ${readingMode === 'narrative' ? 'bg-slate-900 text-emerald-400' : 'text-slate-500'}">
+                            <i data-lucide="message-square-text" class="w-3 h-3 inline mr-1"></i><span class="text-[9px] font-bold">NARRATIVO</span>
+                        </button>
+                        <button onclick="setMode('data')" class="px-3 py-1.5 rounded-xl transition-all ${readingMode === 'data' ? 'bg-slate-900 text-emerald-400' : 'text-slate-500'}">
+                            <i data-lucide="bar-chart-3" class="w-3 h-3 inline mr-1"></i><span class="text-[9px] font-bold">DATOS</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MAIN -->
+                <div class="flex-1 px-8 flex flex-col items-center">
+                    <!-- CHAPTER LIST OVERLAY -->
+                    ${showChapters ? `
+                    <div class="absolute inset-0 z-40 bg-slate-900/98 backdrop-blur-xl p-8 overflow-y-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-white tracking-tight">Capítulos</h3>
+                            <button onclick="toggleChapters()" class="text-slate-500"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="space-y-2">
+                            ${chapters.map((ch, idx) => `
+                                <button onclick="selectChapter(${idx})" class="w-full text-left p-4 rounded-3xl transition-all flex items-start gap-4 ${currentChapter === idx ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800/50 hover:bg-slate-800'}">
+                                    <span class="text-xs font-black mt-1">0${idx+1}</span>
+                                    <span class="text-sm font-bold leading-tight">${ch.title}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- COVER -->
+                    <div class="relative w-full aspect-square max-w-[260px] mb-8">
+                        <div class="absolute inset-0 bg-emerald-500 rounded-[3rem] blur-3xl opacity-20 animate-pulse-slow"></div>
+                        <div class="relative w-full h-full rounded-[3rem] bg-slate-800 border border-slate-700 p-1 overflow-hidden shadow-2xl">
+                            <div class="w-full h-full rounded-[2.8rem] bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
+                                <div class="mb-4 p-4 rounded-full bg-emerald-500/10 text-emerald-500">
+                                    <i data-lucide="${readingMode === 'narrative' ? 'book-open' : 'bar-chart-3'}" class="w-12 h-12"></i>
+                                </div>
+                                <h2 class="text-lg font-black text-white leading-tight mb-2">${chapters[currentChapter].title}</h2>
+                                <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">${readingMode === 'narrative' ? 'Lectura Contextual' : 'Desglose Estadístico'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTROLS -->
+                <div class="bg-slate-800/40 backdrop-blur-md p-10 rounded-t-[3.5rem] border-t border-slate-800/50">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex bg-slate-900/50 p-1.5 rounded-2xl border border-slate-700/50">
+                            ${[1, 1.25, 1.5].map(s => `
+                                <button onclick="setSpeed(${s})" class="px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${playbackSpeed === s ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-500'}">
+                                    ${s}x
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="toggleAutoNext()" class="flex items-center gap-2 text-slate-500 bg-slate-900/50 px-3 py-2 rounded-2xl border border-slate-700/50">
+                            <i data-lucide="zap" class="w-3 h-3 ${autoNext ? 'text-emerald-500' : ''}"></i>
+                            <span class="text-[9px] font-black uppercase">AUTO-NEXT ${autoNext ? 'ON' : 'OFF'}</span>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <button onclick="prevChapter()" class="p-4 text-slate-400 hover:text-white transition-all"><i data-lucide="skip-back" class="w-8 h-8"></i></button>
+                        
+                        <button id="playBtn" onclick="togglePlay()" class="w-20 h-20 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-full flex items-center justify-center transition-all shadow-2xl shadow-emerald-500/20 active:scale-95">
+                            ${isLoading ? `<i data-lucide="loader-2" class="w-10 h-10 animate-spin"></i>` : 
+                              isPlaying ? `<i data-lucide="pause" class="w-10 h-10 fill-current"></i>` : 
+                              `<i data-lucide="play" class="w-10 h-10 fill-current ml-1"></i>`}
+                        </button>
+
+                        <button onclick="nextChapter()" class="p-4 text-slate-400 hover:text-white transition-all"><i data-lucide="skip-forward" class="w-8 h-8"></i></button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // FUNCIONES DE CONTROL
+        function toggleChapters() { showChapters = !showChapters; render(); }
+        function selectChapter(idx) { currentChapter = idx; loadAudio(); showChapters = false; render(); }
+        function setMode(mode) { readingMode = mode; loadAudio(); render(); }
+        function setSpeed(s) { playbackSpeed = s; audio.playbackRate = s; render(); }
+        function toggleAutoNext() { autoNext = !autoNext; render(); }
+        function nextChapter() { if(currentChapter < chapters.length-1) selectChapter(currentChapter + 1); }
+        function prevChapter() { if(currentChapter > 0) selectChapter(currentChapter - 1); }
+
+        function togglePlay() {
+            if (!audio.src || audio.src === "") { loadAudio(); return; }
+            if (isPlaying) { audio.pause(); isPlaying = false; } 
+            else { audio.play(); isPlaying = true; }
+            render();
+        }
+
+        async function loadAudio() {
+            if (apiKey === "") {
+                alert("Por favor, ingresa una API Key válida de Google AI Studio en el código para activar el audio.");
+                return;
+            }
+            isLoading = true; render();
+            const text = readingMode === 'narrative' ? chapters[currentChapter].narrative : chapters[currentChapter].data;
+            
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: text }] }],
+                        generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } },
+                        model: "gemini-2.5-flash-preview-tts"
+                    })
+                });
+                
+                const data = await response.json();
+                const b64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                const mime = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
+                const rate = parseInt(mime?.split('rate=')[1]) || 24000;
+
+                if (b64) {
+                    const bin = atob(b64);
+                    const pcm = new Int16Array(bin.length / 2);
+                    for (let i = 0; i < pcm.length; i++) pcm[i] = (bin.charCodeAt(i*2+1) << 8) | bin.charCodeAt(i*2);
+                    const wavBlob = pcmToWav(pcm, rate);
+                    audio.src = URL.createObjectURL(wavBlob);
+                    audio.playbackRate = playbackSpeed;
+                    audio.play();
+                    isPlaying = true;
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error al cargar el audio. Verifica tu API Key.");
+            } finally {
+                isLoading = false; render();
+            }
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+            const writeString = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+            writeString(0, 'RIFF'); view.setUint32(4, 32 + pcmData.length * 2, true);
+            writeString(8, 'WAVE'); writeString(12, 'fmt '); view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+            writeString(36, 'data'); view.setUint32(40, pcmData.length * 2, true);
+            for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        audio.onended = () => {
+            isPlaying = false;
+            if (autoNext && currentChapter < chapters.length - 1) {
+                setTimeout(() => nextChapter(), 3000);
+            }
+            render();
+        };
+
+        render();
+    </script>
+</body>
+</html>
