@@ -12,11 +12,14 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: white; }
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .progress-glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -26,50 +29,53 @@
         const { useState, useEffect, useRef, useMemo } = React;
 
         const App = () => {
-            // --- CONFIGURACIÓN ---
-            const apiKey = "AIzaSyCUhhxDU1SqBoZMoUmT41boLq6AEMViGUU"; // PEGA TU API KEY AQUÍ
+            // --- GESTIÓN SEGURA DE API KEY ---
+            // La clave NO se guarda aquí. Se pide al usuario y se guarda en el navegador.
+            const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || "");
+            const [tempKey, setTempKey] = useState("");
+            const [showSetup, setShowSetup] = useState(!localStorage.getItem('gemini_api_key'));
             
-            // --- CONTENIDO DEL REPORTE (DENSIDAD MÁXIMA - ~600 PALABRAS POR CAPÍTULO) ---
+            // --- CONTENIDO DEL REPORTE ---
             const chapters = useMemo(() => [
                 {
                     id: 0,
                     title: "Resumen Ejecutivo",
-                    narrative: `Resumen Ejecutivo del Cuarto Reporte de Humedales de la Región del Biobío, edición dos mil veintiséis. Este documento constituye un hito en la vigilancia ambiental regional al presentarse en un escenario de crisis socionatural sin precedentes. La génesis de este reporte se halla en el análisis exhaustivo de noventa y seis registros obtenidos a través del catastro ciudadano de la Red de Humedales, recopilados entre diciembre de dos mil veinticinco y enero de dos mil veintiséis. Tras un proceso riguroso de validación técnica y encuestas de terreno, se consolidaron setenta y nueve registros críticos que actúan como una radiografía de la fragilidad de nuestro territorio. Este reporte se dirige no solo a la comunidad académica y científica, sino fundamentalmente a los tomadores de decisiones y a la sociedad civil organizada, buscando integrar perspectivas de ecología profunda, hidrología post-incendio y cartografía social. La tesis central que sostenemos es que la región enfrenta una crisis de convergencia acelerada: la degradación histórica de los humedales urbanos, provocada por una expansión inmobiliaria e industrial desmedida, se ha intersectado fatalmente con la devastación causada por los mega incendios forestales de enero de dos mil veintiséis. Esta situación ha creado un estado de riesgo agravado que amenaza la seguridad hídrica y la biodiversidad de nuestras cuencas costeras. El reporte advierte que los incendios no deben ser vistos como eventos aislados, sino como transformadores radicales de la capacidad de regulación de las cuencas. Frente a este panorama sombrío, la propuesta del Escudo Azul-Verde emerge como una estrategia de resiliencia urgente. Entendemos a los humedales no como elementos decorativos o terrenos eriazos, sino como infraestructura crítica de seguridad pública. El reporte concluye que la inacción institucional ante la pérdida de estos ecosistemas comprometerá la disponibilidad de agua dulce para consumo humano en un período de apenas veinticuatro a treinta y seis meses, por lo que la restauración ecológica y la protección legal deben transformarse en la máxima prioridad de la agenda regional del Biobío.`,
-                    data: `Análisis Estadístico del Resumen Ejecutivo. Universo de datos: noventa y seis registros ciudadanos iniciales procesados mediante plataforma digital. Validación: setenta y nueve casos críticos confirmados bajo protocolos de verificación técnica en terreno. Ámbito geográfico: Provincia de Concepción con énfasis en cuencas costeras, Provincia de Arauco y Provincia de Biobío. Hallazgo de criticidad: El cien por ciento de las cuencas analizadas presentan una alteración significativa en sus servicios ecosistémicos de regulación hídrica. Impacto del fuego: Veinte mil quinientas hectáreas afectadas directamente en la zona de interfase y cabeceras de cuenca. Proyección de riesgo: La degradación actual de los humedales receptores se traduce en un riesgo inminente de desabastecimiento hídrico para poblaciones locales en un horizonte inferior a los tres años. Severidad del suelo: Se documenta un sesenta y cinco por ciento de daño extremo en los horizontes orgánicos del suelo, lo que anula la capacidad de infiltración natural de la región.`
+                    narrative: `Resumen Ejecutivo del Cuarto Reporte de Humedales de la Región del Biobío, edición dos mil veintiséis. Este documento constituye un hito en la vigilancia ambiental regional al presentarse en un escenario de crisis socionatural sin precedentes tras los eventos climáticos extremos de los últimos años. La génesis de este reporte se halla en el análisis exhaustivo de noventa y seis registros obtenidos a través del catastro ciudadano de la Red de Humedales, recopilados meticulosamente entre diciembre de dos mil veinticinco y enero de dos mil veintiséis. Tras un proceso riguroso de validación técnica, cruce de datos geoespaciales y encuestas de terreno, se consolidaron setenta y nueve registros críticos que actúan como una radiografía de la fragilidad extrema de nuestro territorio. Este reporte no es solo un documento técnico; se dirige fundamentalmente a los tomadores de decisiones, a la comunidad científica y a la sociedad civil organizada, buscando integrar perspectivas de ecología profunda, hidrología post-incendio y cartografía social para mejorar la capacidad de respuesta regional. La tesis central que sostenemos en este reporte es que la región del Biobío enfrenta una crisis de convergencia acelerada: la degradación histórica de los humedales urbanos, provocada por décadas de expansión inmobiliaria e industrial desmedida, se ha intersectado fatalmente con la devastación causada por los mega incendios forestales de enero de dos mil veintiséis. Esta situación ha creado un estado de riesgo socionatural agravado que amenaza directamente la seguridad hídrica, la biodiversidad y la habitabilidad de nuestras cuencas costeras. El reporte advierte con urgencia que los incendios no deben ser vistos como eventos aislados en el cerro, sino como transformadores radicales de la capacidad de regulación de toda la cuenca hidrológica. Frente a este panorama de vulnerabilidad, la propuesta del Escudo Azul-Verde emerge como la estrategia de resiliencia más urgente de nuestra época. Entendemos a los humedales no como elementos pasivos del paisaje o simples terrenos eriazos a la espera de ser pavimentados, sino como infraestructura crítica de seguridad pública. El reporte concluye que la inacción institucional ante la pérdida progresiva de estos ecosistemas comprometerá la disponibilidad de agua dulce para consumo humano en un período de apenas veinticuatro a treinta y seis meses, por lo que la restauración ecológica integral y la protección legal efectiva deben transformarse de inmediato en la máxima prioridad de la agenda pública regional del Biobío para asegurar el bienestar de las futuras generaciones.`,
+                    data: `Análisis Estadístico y Cuantitativo del Resumen Ejecutivo. Universo de datos: noventa y seis registros ciudadanos iniciales procesados mediante plataforma digital de monitoreo. Validación: setenta y nueve casos críticos confirmados bajo protocolos de verificación técnica en terreno. Ámbito geográfico: Provincia de Concepción con énfasis en cuencas costeras del Gran Concepción, Provincia de Arauco y Provincia de Biobío. Hallazgo de criticidad sistémica: El cien por ciento de las cuencas analizadas presentan una alteración estadísticamente significativa en sus servicios ecosistémicos de regulación hídrica y filtración de sedimentos. Impacto directo del fuego: Veinte mil quinientas hectáreas afectadas directamente en la zona de interfase y cabeceras de cuenca. Proyección de riesgo hídrico: La degradación actual de los humedales receptores se traduce en un riesgo inminente de desabastecimiento hídrico para poblaciones locales en un horizonte inferior a los tres años. Severidad del daño al suelo: Se documenta mediante análisis químico un sesenta y cinco por ciento de daño extremo en los horizontes orgánicos del suelo, lo que anula casi por completo la capacidad de infiltración natural de la región en las áreas quemadas.`
                 },
                 {
                     id: 1,
                     title: "Capítulo 1: Metodología y Ciencia Ciudadana",
-                    narrative: `Capítulo Uno. Metodología y Vigilancia Ciudadana en el Territorio. El marco metodológico de este Cuarto Reporte rompe deliberadamente con los paradigmas tradicionales de la vigilancia técnica cerrada y centralizada. En lugar de depender exclusivamente de sensores remotos o informes institucionales que a menudo llegan tarde a la crisis, hemos implementado un modelo de cartografía social y ciencia ciudadana de base. Este proceso se operacionalizó a través de un levantamiento primario de datos digitales entre diciembre de dos mil veinticinco y enero de dos mil veintiséis, permitiendo a los habitantes del Biobío reportar en tiempo real las amenazas que afectan a sus ecosistemas locales. Lo que distingue a esta metodología es su capacidad para capturar percepciones de riesgo e iniciativas de gestión que suelen ser invisibles para las métricas gubernamentales. La validación de los setenta y nueve humedales no fue solo un ejercicio estadístico, sino una reconstrucción colectiva del estado de salud de nuestras cuencas. El reporte revela una verdad política incómoda: el sesenta y ocho punto cuatro por ciento de los humedales reportados están bajo la protección y vigilancia exclusiva de organizaciones socioambientales comunitarias que operan con recursos autogestionados. En contraste, la presencia de la academia institucional y del aparato estatal en la gestión directa de estos sitios es de apenas un seis punto tres por ciento. Esta disparidad demuestra que la verdadera primera línea de defensa ambiental en el Biobío es la ciudadanía organizada. La metodología también incluyó una revisión bibliográfica profunda y el análisis de fuentes públicas del Ministerio del Medio Ambiente, cruzando la información legal con la realidad física del terreno. El resultado es un inventario de ciento cuarenta y dos amenazas específicas categorizadas que permiten identificar patrones de daño sistémico en la región. Este enfoque integral nos permite afirmar que la protección de los humedales no es solo una cuestión de biólogos o ingenieros, sino una lucha política por el control y la supervivencia de los bienes comunes hídricos en el contexto de la crisis climática global.`,
-                    data: `Desglose Métrico de la Metodología Ciudadana. Periodo de recolección: sesenta días comprendidos entre diciembre de dos mil veinticinco y enero de dos mil veintiséis. Muestra final: setenta y nueve humedales validados. Identificación de riesgos: ciento cuarenta y dos amenazas específicas documentadas y georreferenciadas. Distribución de la Gobernanza Efectiva: Organizaciones ciudadanas lideran el sesenta y ocho punto cuatro por ciento de los esfuerzos de protección. Instituciones estatales y académicas lideran únicamente el seis punto tres por ciento. Brecha de Financiamiento: El noventa por ciento de las iniciativas de monitoreo y limpieza operan con presupuesto cero de origen público, dependiendo íntegramente de donaciones y trabajo voluntario. Participación comunitaria: se estima que más de mil doscientas personas participaron directa o indirectamente en el levantamiento de información para este reporte regional.`
+                    narrative: `Capítulo Uno. Metodología, Vigilancia Ciudadana y Empoderamiento Territorial. El marco metodológico que sustenta este Cuarto Reporte rompe deliberadamente con los paradigmas tradicionales de la vigilancia técnica cerrada, burocrática y centralizada. En lugar de depender exclusivamente de sensores remotos de baja resolución o informes institucionales que a menudo llegan meses después de ocurrida la crisis, hemos implementado un modelo robusto de cartografía social y ciencia ciudadana de base. Este proceso se operacionalizó a través de un levantamiento primario de datos digitales entre diciembre de dos mil veinticinco y enero de dos mil veintiséis, permitiendo a los habitantes de diversas comunas del Biobío reportar en tiempo real las amenazas específicas que afectan a sus ecosistemas locales. Lo que distingue radicalmente a esta metodología es su capacidad única para capturar percepciones de riesgo, conocimientos ancestrales e iniciativas de gestión comunitaria que suelen ser totalmente invisibles para las métricas gubernamentales estándar. La validación de los setenta y nueve humedales no fue solo un ejercicio estadístico frío, sino una reconstrucción colectiva y participativa del estado de salud de nuestras cuencas. El reporte revela una verdad política y social sumamente incómoda para la institucionalidad: el sesenta y ocho punto cuatro por ciento de los humedales reportados están bajo la protección, vigilancia y defensa exclusiva de organizaciones socioambientales comunitarias que operan con recursos propios y autogestionados. En contraste, la presencia y acción efectiva de la academia institucional y del aparato estatal en la gestión directa de estos sitios es de apenas un seis punto tres por ciento. Esta disparidad abismante demuestra que la verdadera primera línea de defensa ambiental en la Región del Biobío es, sin lugar a dudas, la ciudadanía organizada. Nuestra metodología también incluyó una revisión bibliográfica profunda de la historia reciente de tormentas de fuego y el análisis de fuentes públicas del Ministerio del Medio Ambiente, cruzando la información legal con la cruda realidad física del terreno. El resultado es un inventario detallado de ciento cuarenta y dos amenazas específicas categorizadas que permiten identificar patrones de daño sistémico y omisión institucional en toda la región. Este enfoque integral nos permite afirmar con propiedad que la protección de los humedales no es solo una cuestión técnica para biólogos o ingenieros, sino una lucha política esencial por el control, el cuidado y la supervivencia de los bienes comunes hídricos en el contexto de la crisis climática global.`,
+                    data: `Desglose Métrico de la Metodología Ciudadana. Periodo de ejecución y recolección: sesenta días continuos comprendidos entre diciembre de dos mil veinticinco y enero de dos mil veintiséis. Muestra final validada: setenta y nueve ecosistemas hídricos con ficha técnica completa. Identificación de riesgos: ciento cuarenta y dos amenazas específicas documentadas, georreferenciadas y validadas mediante registro fotográfico. Distribución de la Gobernanza Efectiva en el territorio: Las organizaciones ciudadanas y juntas de vecinos lideran el sesenta y ocho punto cuatro por ciento de los esfuerzos reales de protección. Las instituciones estatales y los centros de investigación académica lideran únicamente el seis punto tres por ciento. Brecha de Financiamiento Crítica: El noventa por ciento de las iniciativas de monitoreo, restauración y limpieza operan con presupuesto cero de origen público, dependiendo íntegramente de la autogestión. Participación ciudadana estimada: se calcula que más de mil doscientas personas participaron activamente en el levantamiento de información para este reporte regional.`
                 },
                 {
                     id: 2,
                     title: "Capítulo 2: Los Megaincendios y la Hidrología",
-                    narrative: `Capítulo Dos. Los Megaincendios como Eventos Transformadores de Cuenca. Durante enero de dos mil veintiséis, la Región del Biobío experimentó una de las catástrofes forestales más agresivas de la última década. Este capítulo analiza cómo el fuego ha alterado permanentemente el ciclo hidrológico regional. La combustión severa de miles de hectáreas de plantaciones forestales y bosque nativo en las zonas de cabecera no es solo una pérdida de biomasa; es una transformación química del suelo. El calor extremo ha generado lo que denominamos hidrofobicidad post-incendio: una capa repelente al agua que impide que la lluvia se infiltre en la tierra. Esta alteración significa que, ante las primeras tormentas de otoño, el suelo ya no actuará como una esponja, sino como un pavimento impermeable. El resultado es un aumento drástico en la escorrentía superficial, donde el agua corre libremente por las laderas, arrastrando consigo toneladas de cenizas, metales pesados y sedimentos directamente hacia los humedales que se encuentran en las zonas bajas y costeras. Este proceso de colmatación acelerada es una sentencia de muerte para muchos ecosistemas. El humedal, al recibir este flujo de material sólido, pierde su profundidad y su capacidad de almacenamiento, lo que aumenta exponencialmente el riesgo de inundaciones en las zonas urbanas adyacentes. El reporte enfatiza la visión del continuo hidrológico: no se puede proteger un humedal costero si no se gestiona la restauración de los cerros quemados. Los incendios han roto la conectividad natural de la cuenca, y los humedales están actuando como el último filtro de un sistema que está colapsando bajo el peso de la erosión. La urgencia de la restauración ecológica radica en que, sin una cobertura vegetal que frene el agua en la parte alta, las ciudades del Gran Concepción enfrentarán una vulnerabilidad hídrica sin precedentes en la próxima temporada de lluvias, transformando los servicios ecosistémicos de regulación en amenazas de desastre socionatural.`,
-                    data: `Indicadores de Impacto Hidrológico Post-Incendio. Superficie total devastada en Provincia de Concepción: veinte mil quinientas hectáreas. Severidad del daño al suelo: sesenta y cinco por ciento de las áreas quemadas presentan daño extremo en la capa orgánica. Alteración del flujo hídrico: se proyecta un incremento del trescientos por ciento en la velocidad y volumen de la escorrentía superficial durante eventos de precipitación intensa. Carga sedimentaria: se estima que los humedales costeros recibirán en una sola temporada de lluvias un volumen de sedimentos equivalente a lo acumulado en diez años de condiciones climáticas normales. Propiedades físicas: aumento crítico de la repelencia al agua en los suelos de granito meteorizado característicos de la cordillera de la costa en el Biobío.`
+                    narrative: `Capítulo Dos. Los Megaincendios como Eventos Transformadores de la Dinámica de Cuenca. Durante el mes de enero de dos mil veintiséis, la Región del Biobío experimentó una de las catástrofes forestales más agresivas y rápidas de la última década, afectando zonas que históricamente se consideraban refugios climáticos. Este capítulo analiza en profundidad cómo el fuego extremo ha alterado de manera permanente el ciclo hidrológico regional. La combustión severa de miles de hectáreas de plantaciones forestales y los pocos remanentes de bosque nativo en las zonas de cabecera de cuenca no es solo una pérdida trágica de biomasa y biodiversidad; es, ante todo, una transformación química y física del suelo. El calor extremo de las llamas ha generado un fenómeno físico denominado hidrofobicidad post-incendio: una capa química repelente al agua que se sitúa a pocos centímetros de la superficie, impidiendo que la lluvia se infiltre de manera natural en la tierra. Esta alteración significa que, ante las próximas tormentas de otoño e invierno, el suelo forestal ya no actuará como la esponja reguladora que necesitamos, sino más bien como un pavimento impermeable. El resultado directo es un aumento drástico y peligroso en la escorrentía superficial, donde el agua corre a gran velocidad por las laderas desnudas, arrastrando consigo toneladas de cenizas tóxicas, metales pesados y sedimentos finos directamente hacia los humedales que se encuentran en las zonas bajas. Este proceso de colmatación acelerada es una amenaza existencial para muchos ecosistemas costeros. El humedal, al recibir este flujo masivo de material sólido, pierde rápidamente su profundidad y su capacidad vital de almacenamiento, lo que aumenta exponencialmente el riesgo de inundaciones catastróficas en las zonas urbanas consolidadas. El reporte enfatiza la visión del continuo hidrológico: no se puede pretender proteger un humedal costero si no se gestiona con urgencia la restauración integral de los cerros quemados. Los incendios han roto la conectividad natural de la cuenca, y los humedales están actuando hoy como el último y frágil filtro de un sistema que está al borde del colapso bajo el peso de la erosión. La urgencia de la restauración ecológica radica en que, sin una cobertura vegetal efectiva que frene la energía del agua en la parte alta, las ciudades del Gran Concepción enfrentarán una vulnerabilidad hídrica y de inundaciones sin precedentes, transformando lo que antes eran servicios ecosistémicos de regulación en amenazas latentes de desastre regional.`,
+                    data: `Indicadores Técnicos de Impacto Hidrológico Post-Incendio. Superficie total devastada en la Provincia de Concepción: veinte mil quinientas hectáreas de cobertura vegetal. Severidad del daño edafológico: sesenta y cinco por ciento de las áreas quemadas presentan daño extremo en la estructura orgánica del suelo. Alteración proyectada del flujo hídrico: se estima un incremento del trescientos por ciento en la velocidad de escorrentía y volumen de flujo superficial durante eventos de precipitación intensa. Carga sedimentaria proyectada: se estima que los humedales costeros recibirán en una sola temporada de lluvias un volumen de sedimentos equivalente a lo acumulado en diez años bajo condiciones normales de cobertura. Propiedades físicas del suelo: aumento crítico de la repelencia al agua inducida por calor en los suelos graníticos de la cordillera de la costa, elevando el riesgo de remociones en masa y aluviones en quebradas tributarias a los humedales urbanos.`
                 },
                 {
                     id: 3,
                     title: "Capítulo 3: Radiografía de Amenazas y Casos Críticos",
-                    narrative: `Capítulo Tres. Radiografía de Amenazas y Fragilidad Territorial. El estado actual de los humedales en la Región del Biobío es de alerta máxima. La presión sobre estos ecosistemas no es uniforme, pero sí persistente y sistémica. El análisis de los registros ciudadanos revela una concentración crítica de amenazas en el Área Metropolitana de Concepción. La comuna de Coronel lidera el ranking de vulnerabilidad con veintiocho humedales bajo amenaza directa, seguida de cerca por Talcahuano con veinticuatro. Estas cifras no son meras estadísticas; representan ecosistemas vitales que están siendo cercados por la contaminación y la expansión urbana. El reporte identifica que la contaminación por residuos sólidos y vertidos industriales afecta al ochenta y nueve por ciento de los humedales analizados. Sin embargo, la amenaza más estructural sigue siendo la presión inmobiliaria, presente en el ochenta y un por ciento de los casos. Es particularmente alarmante el papel de los rellenos inmobiliarios, que a menudo cuentan con autorizaciones precarias o directamente ilegales. Casos como el humedal Cantarana en la comuna de Los Ángeles ejemplifican esta crisis: proyectos de vialidad y vivienda social, impulsados muchas veces por el propio aparato estatal, se construyen sobre rellenos que destruyen la conectividad hídrica. Es una paradoja trágica que el Estado, llamado a proteger estos bienes comunes mediante la Ley de Humedales Urbanos, sea en ocasiones el principal agente perturbador. El reporte también documenta una brecha de fiscalización inaceptable. A pesar del alto volumen de denuncias ciudadanas por rellenos o vertidos, solo un doce por ciento de estos casos derivan en procesos sancionatorios efectivos. Esta impunidad fomenta un modelo de desarrollo que considera al humedal como un terreno eriazo a la espera de ser pavimentado, ignorando que cada metro cuadrado de humedal perdido es una barrera menos contra las inundaciones y una pérdida irreversible de biodiversidad local. La fragilidad territorial del Biobío está hoy determinada por la colisión entre un modelo extractivista y la necesidad urgente de resiliencia climática.`,
-                    data: `Estadísticas de Amenazas y Vulnerabilidad por Comuna. Comunas con mayor incidencia: Coronel (veintiocho registros), Talcahuano (veinticuatro registros), San Pedro de la Paz (doce registros). Categorización de amenazas: Contaminación por residuos y descargas líquidas en el ochenta y nueve por ciento de la muestra. Presión inmobiliaria por rellenos y parcelaciones en el ochenta y un por ciento de los casos. Degradación por incendios forestales en el sesenta por ciento de los sitios. Estado legal: el cuarenta y cinco por ciento de los humedales que ya cuentan con declaratoria oficial bajo la Ley veintiún mil doscientos dos han sufrido intervenciones físicas destructivas durante el último ciclo anual. Eficacia institucional: solo el doce por ciento de las denuncias ciudadanas ingresadas formalmente han resultado en sanciones o medidas de mitigación reales.`
+                    narrative: `Capítulo Tres. Radiografía de Amenazas, Presiones y Fragilidad Territorial. El estado actual de los humedales en la Región del Biobío es de alerta máxima y requiere una intervención inmediata. La presión sobre estos ecosistemas críticos no es uniforme ni azarosa, sino persistente, sistémica y ligada a modelos de desarrollo extractivos. El análisis detallado de los registros ciudadanos revela una concentración alarmante y peligrosa de amenazas en el Área Metropolitana de Concepción. La comuna de Coronel lidera tristemente el ranking regional de vulnerabilidad con veintiocho humedales bajo amenaza directa y severa, seguida muy de cerca por Talcahuano con veinticuatro registros validados. Estas cifras no son meras abstracciones estadísticas; representan ecosistemas vitales que están siendo cercados y asfixiados por la contaminación industrial y la expansión urbana descontrolada. El reporte identifica con claridad que la contaminación por residuos sólidos domiciliarios, escombros industriales y vertidos líquidos ilegales afecta al ochenta y nueve por ciento de los humedales analizados. Sin embargo, la amenaza más estructural y difícil de revertir sigue siendo la presión del mercado inmobiliario, presente en el ochenta y un por ciento de los casos reportados. Es particularmente escandaloso observar el papel de los rellenos inmobiliarios, que a menudo se ejecutan mediante el movimiento de tierras sin autorizaciones o basándose en permisos precarios que ignoran la realidad hidrológica del suelo. Casos emblemáticos como el humedal Cantarana en la comuna de Los Ángeles ejemplifican perfectamente esta crisis de gobernanza: proyectos de vialidad estructurante y conjuntos de vivienda social, impulsados muchas veces por el propio aparato estatal a través del SERVIU o el Ministerio de Obras Públicas, se construyen sobre rellenos masivos que destruyen para siempre la conectividad hídrica subterránea. Es una paradoja trágica que el mismo Estado llamado a proteger estos bienes comunes mediante la Ley de Humedales Urbanos, sea en la práctica uno de los principales agentes perturbadores de su integridad. El reporte también documenta una brecha de fiscalización que raya en la negligencia institucional. A pesar del altísimo volumen de denuncias ciudadanas formales por rellenos o vertidos ilegales, solo un exiguo doce por ciento de estos casos derivan en procesos sancionatorios efectivos o medidas de reparación real. Esta impunidad sistémica fomenta un modelo de desarrollo que sigue considerando al humedal como un obstáculo al progreso o un terreno eriazo a la espera de ser pavimentado, ignorando deliberadamente que cada metro cuadrado de humedal perdido es una barrera menos contra las inundaciones y una pérdida definitiva de la identidad natural del Biobío.`,
+                    data: `Estadísticas de Amenazas y Vulnerabilidad por Comuna. Comunas con mayor densidad de registros críticos: Coronel (veintiocho registros), Talcahuano (veinticuatro registros), San Pedro de la Paz (doce registros). Categorización jerárquica de amenazas: Contaminación por residuos sólidos y descargas líquidas industriales detectada en el ochenta y nueve por ciento de la muestra validada. Presión inmobiliaria mediante rellenos y loteos irregulares identificada en el ochenta y un por ciento de los casos. Degradación indirecta por incendios forestales en el sesenta por ciento de los sitios de estudio. Estado de protección legal: el cuarenta y cinco por ciento de los humedales que ya cuentan con declaratoria oficial bajo la Ley veintiún mil doscientos dos han sufrido algún tipo de intervención física destructiva o alteración de cauce durante el último ciclo anual. Eficacia de la institucionalidad ambiental: solo el doce por ciento de las denuncias ciudadanas han resultado en multas o paralizaciones de obras efectivas.`
                 },
                 {
                     id: 4,
                     title: "Capítulo 4: Gobernanza y el Escudo Azul-Verde",
-                    narrative: `Capítulo Cuatro. Gobernanza, Resiliencia y la Propuesta del Escudo Azul-Verde. El diagnóstico de este reporte es claro: la normativa actual es insuficiente si no se acompaña de una gestión territorial activa y financiada. Existe una brecha abismante entre la protección legal en el papel y la realidad física del agua. El dato es contundente: el noventa y cuatro por ciento de los humedales urbanos declarados en la Región del Biobío carecen de un plan de manejo operativo que garantice su supervivencia a largo plazo. Ante este vacío de gestión, el reporte propone un cambio de paradigma basado en la creación de un Escudo Azul-Verde. Este concepto busca integrar a los humedales, esteros y cuencas en el corazón de la planificación urbana, no como áreas de conservación aisladas, sino como infraestructura crítica de seguridad pública. La meta estratégica de esta nueva gobernanza es la acreditación del Área Metropolitana de Concepción como Ciudad Humedal bajo la prestigiosa Convención Ramsar. Lograr este sello internacional no es una cuestión cosmética; es una herramienta de presión política y técnica para obligar a la coordinación de las municipalidades, asegurar financiamiento internacional para la restauración post-incendio y establecer estándares de protección que las industrias no puedan ignorar. Proponemos que los humedales sean reconocidos como soluciones basadas en la naturaleza para la adaptación climática. Esto implica destinar fondos regionales específicos para la limpieza, restauración de flora nativa y el monitoreo comunitario permanente. El reporte concluye con un llamado urgente a las autoridades regionales para que dejen de ver la protección ambiental como un obstáculo al desarrollo y comiencen a verla como la única garantía de habitabilidad para las ciudades del Biobío. La construcción del Escudo Azul-Verde es, en última instancia, un acto de justicia territorial y una apuesta por la vida en un planeta que se calienta.`,
-                    data: `Indicadores de Gobernanza y Metas Proyectadas. Situación actual: noventa y cuatro por ciento de humedales declarados sin plan de manejo activo. Eficiencia de respuesta: el tiempo promedio entre una denuncia por relleno y la inspección técnica supera los cuarenta días hábiles. Meta de Acreditación Ramsar: Postulación del Área Metropolitana de Concepción al programa de Ciudades Humedal para el periodo dos mil veintisiete. Proyección financiera: la acreditación permitiría el acceso a fondos de cooperación internacional estimados en cinco millones de dólares para restauración ecológica y sistemas de monitoreo en un plazo de cinco años. Propuesta de inversión regional: Creación de un fondo de emergencia para humedales equivalente al dos por ciento del presupuesto regional anual para obras de mitigación post-incendio.`
+                    narrative: `Capítulo Cuatro. Gobernanza Efectiva, Resiliencia Urbana y la Propuesta del Escudo Azul-Verde. El diagnóstico que emana de este reporte es categórico: la normativa ambiental actual es insuficiente si no se acompaña de una gestión territorial activa, descentralizada y debidamente financiada. Existe hoy una brecha abismal y peligrosa entre la letra de la ley en el papel y la realidad física del agua en el terreno. El dato que mejor ilustra esta negligencia es contundente: el noventa y cuatro por ciento de los humedales urbanos ya declarados oficialmente en la Región del Biobío carecen de un plan de manejo operativo que esté siendo ejecutado con presupuesto asignado. Ante este vacío crítico de gestión, el reporte propone un cambio de paradigma radical basado en la creación e implementación del Escudo Azul-Verde. Este concepto no es una metáfora estética, sino una estrategia para integrar a los humedales, esteros, ríos y cuencas en el corazón mismo de la planificación urbana y la gestión de riesgos, tratándolos no como áreas de conservación aisladas, sino como infraestructura crítica de seguridad pública indispensable. La meta estratégica y política de esta nueva gobernanza debe ser la acreditación del Área Metropolitana de Concepción como Ciudad Humedal bajo la prestigiosa Convención Ramsar de las Naciones Unidas. Lograr este sello de clase mundial no es una cuestión de prestigio cosmético; es, ante todo, una herramienta potente de presión política y técnica para obligar a la coordinación obligatoria entre las municipalidades, asegurar fondos de cooperación internacional para la restauración post-incendio y establecer estándares de protección que las industrias locales ya no puedan ignorar. Proponemos formalmente que los humedales sean reconocidos como soluciones basadas en la naturaleza para la adaptación climática regional. Esto implica necesariamente destinar fondos del Gobierno Regional específicos para la limpieza mayor, la restauración masiva de flora nativa y el fortalecimiento del monitoreo comunitario permanente mediante guardaparques ciudadanos. El reporte concluye con un llamado urgente y enérgico a las autoridades regionales para que abandonen la visión de la protección ambiental como un obstáculo al desarrollo económico y comiencen a verla como la única garantía de supervivencia y habitabilidad para las ciudades del Biobío en el siglo veintiuno. La construcción del Escudo Azul-Verde es un acto de justicia territorial necesario para enfrentar la incertidumbre climática que se avecina.`,
+                    data: `Indicadores de Gestión y Metas Regionales Proyectadas. Situación de planificación actual: noventa y cuatro por ciento de humedales declarados sin ningún tipo de plan de manejo activo o presupuesto asignado. Eficiencia de respuesta institucional: el tiempo promedio transcurrido entre el ingreso de una denuncia por relleno ilegal y la primera inspección técnica en terreno supera hoy los cuarenta días hábiles, permitiendo la consolidación del daño. Meta de Acreditación Internacional Ramsar: Postulación formal del Área Metropolitana de Concepción al programa de Ciudades Humedal para el ciclo dos mil veintisiete. Proyección de financiamiento externo: la acreditación internacional facilitaría el acceso a fondos de cooperación estimados en cinco millones de dólares para restauración ecológica post-incendio en un horizonte de cinco años. Propuesta de inversión pública: Creación inmediata de un fondo de emergencia para humedales equivalente al dos por ciento del presupuesto regional anual para obras de mitigación de desastres.`
                 },
                 {
                     id: 5,
                     title: "Sección Final: Glosario de Términos",
-                    narrative: `Sección Final. Glosario de Términos Hidrológicos y Ecológicos del Reporte dos mil veintiséis. Para navegar correctamente por las complejidades de este documento y participar activamente en la defensa del territorio, es imperativo manejar un lenguaje técnico común que describa los procesos que estamos observando. El primer término fundamental es la Hidrofobicidad del suelo. Se refiere a la repelencia química al agua que se genera en los suelos forestales tras incendios de alta intensidad. Este fenómeno impide la infiltración y es el motor principal de las inundaciones repentinas. El segundo concepto es la Colmatación. Este es el proceso de sedimentación acelerada donde el humedal se llena de cenizas y tierra arrastrada por la lluvia, perdiendo su profundidad y convirtiéndose en un pantano seco. Un tercer pilar es el Continuo Hidrológico, que nos enseña que el agua no reconoce límites administrativos; lo que pasa en la punta del cerro afectará inevitablemente a la costa. El cuarto término es la Resiliencia Ecosistémica, que es la capacidad del humedal para absorber el impacto de una tormenta o un vertido y recuperar su función original sin colapsar. Finalmente, el Escudo Azul-Verde es nuestra propuesta para que la red de humedales actúe como una armadura natural de la ciudad contra el cambio climático. Estos conceptos no son solo palabras; son las herramientas de análisis para entender por qué nuestras ciudades se inundan y por qué la protección de cada metro cuadrado de humedal es una batalla por la seguridad de todos. Conocer este glosario permite a las comunidades dialogar de igual a igual con los expertos y exigir medidas basadas en la ciencia y la realidad del territorio.`,
-                    data: `Definiciones Técnicas de Referencia. Uno: Hidrofobicidad, repelencia al agua inducida por calor que resulta en un ángulo de contacto gota-suelo superior a los noventa grados. Dos: Colmatación sedimentaria, acumulación de material sólido que reduce el volumen útil de la cubeta del humedal en más de un cincuenta por ciento en eventos extremos. Tres: Escurrimiento Superficial, fracción de la precipitación que se desplaza por la superficie del suelo sin infiltrarse. Cuatro: Humedal Urbano, ecosistema hídrico dentro del radio urbano protegido legalmente por la Ley veintiún mil doscientos dos. Cinco: Resiliencia, parámetro que mide la capacidad de retorno de un ecosistema a su estado estable tras una perturbación crítica. Seis: Escudo Azul-Verde, red integrada de ecosistemas hídricos y corredores biológicos gestionada como infraestructura de resiliencia urbana.`
+                    narrative: `Sección Final. Glosario de Términos Hidrológicos, Ecológicos y Políticos del Reporte dos mil veintiséis. Para navegar correctamente por las densas complejidades técnicas de este documento y para que la ciudadanía pueda participar activamente en la defensa informada del territorio, es imperativo manejar un lenguaje común que describa con precisión los procesos biofísicos que estamos observando tras la crisis. El primer término fundamental que todo habitante del Biobío debe conocer es la Hidrofobicidad del suelo. Se refiere específicamente a la repelencia química al agua que se genera en los suelos forestales tras ser sometidos a incendios de alta intensidad; este fenómeno impide la infiltración natural de la lluvia y es el motor principal detrás de las inundaciones repentinas y los aluviones post-fuego. El segundo concepto clave es la Colmatación. Este es el proceso de sedimentación acelerada donde el humedal, que debería ser profundo y dinámico, se llena rápidamente de cenizas, tierra y restos orgánicos arrastrados por la lluvia desde los cerros pelados, perdiendo su profundidad vital y su capacidad de almacenamiento. Un tercer pilar conceptual es el Continuo Hidrológico, una perspectiva científica que nos enseña que el agua no reconoce límites administrativos ni fronteras políticas; lo que ocurre en la cabecera quemada de un cerro afectará inevitablemente, por la fuerza de la gravedad, a la zona costera y a los humedales bajos. El cuarto término esencial es la Resiliencia Ecosistémica, que es la capacidad intrínseca del humedal para absorber impactos severos, como una tormenta extrema o un vertido químico, y recuperar su función original de regulación sin colapsar permanentemente. Finalmente, el Escudo Azul-Verde representa nuestra propuesta política y técnica para que la red interconectada de humedales actúe como una armadura natural que proteja a la ciudad contra el embate del cambio climático. Estos conceptos no son solo palabras técnicas en un papel; son las herramientas intelectuales necesarias para entender por qué nuestras ciudades se inundan hoy y por qué la protección de cada metro cuadrado de humedal es, en realidad, una batalla decisiva por la seguridad, la salud y el futuro de todos los habitantes de la región. Conocer este glosario empodera a las comunidades para dialogar de igual a igual con los expertos y exigir medidas de protección basadas en la evidencia científica y la realidad de la crisis climática actual.`,
+                    data: `Definiciones Técnicas de Referencia para el Reporte. Uno: Hidrofobicidad post-incendio, propiedad de repelencia al agua inducida por el calor que resulta en un ángulo de contacto gota-suelo superior a los noventa grados sexagesimales, reduciendo la infiltración a niveles cercanos a cero. Dos: Colmatación sedimentaria extrema, proceso físico de acumulación de material sólido en suspensión que reduce el volumen útil de la cubeta del humedal en más de un cincuenta por ciento tras eventos de tormenta. Tres: Escurrimiento Superficial Crítico, fracción de la precipitación neta que se desplaza por la superficie del suelo al verse imposibilitada de infiltrarse por saturación o hidrofobicidad. Cuatro: Humedal Urbano Protegido, ecosistema hídrico situado total o parcialmente dentro del radio urbano que goza de protección legal bajo la Ley veintiún mil doscientos dos. Cinco: Resiliencia Dinámica, parámetro biofísico que mide la velocidad de retorno de un ecosistema a su estado de equilibrio estable tras una perturbación crítica de gran escala. Seis: Escudo Azul-Verde, red integrada de ecosistemas naturales, corredores biológicos y cuencas hidrológicas gestionada como infraestructura pública de resiliencia ante el cambio climático.`
                 }
             ], []);
 
-            // --- ESTADOS ---
+            // --- ESTADOS Y REFERENCIAS ---
             const [currentChapter, setCurrentChapter] = useState(0);
             const [isPlaying, setIsPlaying] = useState(false);
             const [loading, setLoading] = useState(false);
@@ -82,7 +88,25 @@
 
             const audioRef = useRef(null);
 
-            // --- LÓGICA DE AUDIO ---
+            // --- PERSISTENCIA DE API KEY ---
+            const handleSaveKey = () => {
+                if (tempKey.startsWith("AIza")) {
+                    localStorage.setItem('gemini_api_key', tempKey);
+                    setApiKey(tempKey);
+                    setShowSetup(false);
+                    setError(null);
+                } else {
+                    alert("Por favor, ingresa una clave válida de Google AI Studio.");
+                }
+            };
+
+            const handleResetKey = () => {
+                localStorage.removeItem('gemini_api_key');
+                setApiKey("");
+                setShowSetup(true);
+            };
+
+            // --- LÓGICA DE AUDIO (TTS) ---
             const pcmToWav = (pcmData, sampleRate) => {
                 const buffer = new ArrayBuffer(44 + pcmData.length * 2);
                 const view = new DataView(buffer);
@@ -98,10 +122,8 @@
             };
 
             const loadAudio = async (index, mode = readingMode) => {
-                if (!apiKey) {
-                    setError("Falta API Key de Google AI Studio.");
-                    return;
-                }
+                if (!apiKey) return;
+                
                 setLoading(true);
                 setError(null);
                 setAudioUrl(null);
@@ -124,6 +146,16 @@
                     });
 
                     const data = await response.json();
+                    
+                    if (data.error) {
+                        if (data.error.status === "UNAUTHENTICATED") {
+                            setError("Clave de API inválida. Por favor, revísala.");
+                            handleResetKey();
+                        } else {
+                            throw new Error(data.error.message || "Error de la API");
+                        }
+                    }
+
                     const b64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
                     const mime = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
                     const rate = parseInt(mime?.split('rate=')[1]) || 24000;
@@ -136,10 +168,10 @@
                         setAudioUrl(URL.createObjectURL(blob));
                         setIsPlaying(true);
                     } else {
-                        throw new Error("No se recibió audio del servidor.");
+                        throw new Error("No se pudo generar el audio.");
                     }
                 } catch (err) {
-                    setError("Error al cargar audio: " + err.message);
+                    setError("Error: " + err.message);
                 } finally {
                     setLoading(false);
                 }
@@ -151,6 +183,7 @@
             };
 
             const changeChapter = (index) => {
+                if (loading) return;
                 setCurrentChapter(index);
                 loadAudio(index);
                 setShowChapters(false);
@@ -163,6 +196,37 @@
                     else audioRef.current.pause();
                 }
             }, [isPlaying, audioUrl, playbackSpeed]);
+
+            // --- INTERFAZ DE CONFIGURACIÓN ---
+            if (showSetup) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-950">
+                        <div className="max-w-md w-full glass-panel p-10 rounded-[3rem] text-center border-emerald-500/30">
+                            <div className="mb-6 p-4 bg-emerald-500/10 rounded-full inline-block text-emerald-500">
+                                <i data-lucide="shield-check" className="w-12 h-12"></i>
+                            </div>
+                            <h2 className="text-2xl font-black mb-4">Configuración Segura</h2>
+                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+                                Para proteger tu cuenta, ingresa tu API Key de Google AI Studio. Esta clave se guardará solo en tu navegador y no se compartirá en GitHub.
+                            </p>
+                            <input 
+                                type="password"
+                                placeholder="Pega tu clave AIza..."
+                                className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-4 text-sm mb-6 focus:border-emerald-500 outline-none transition-all"
+                                value={tempKey}
+                                onChange={(e) => setTempKey(e.target.value)}
+                            />
+                            <button 
+                                onClick={handleSaveKey}
+                                className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-4 rounded-2xl transition-all shadow-xl shadow-emerald-500/20"
+                            >
+                                ACTIVAR AUDIOLIBRO
+                            </button>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" className="block mt-6 text-[10px] text-slate-500 uppercase tracking-widest hover:text-emerald-400">¿No tienes una clave? Consíguela gratis aquí</a>
+                        </div>
+                    </div>
+                );
+            }
 
             return (
                 <div className="min-h-screen flex items-center justify-center p-4 sm:p-8">
@@ -194,7 +258,7 @@
                                     <h3 className="text-xl font-bold text-white">Capítulos</h3>
                                     <button onClick={() => setShowChapters(false)} className="text-slate-400"><i data-lucide="x"></i></button>
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-3 custom-scroll overflow-y-auto max-h-[70vh] pr-2">
                                     {chapters.map((ch, idx) => (
                                         <button key={idx} onClick={() => changeChapter(idx)} className={`w-full text-left p-5 rounded-3xl transition-all flex items-center gap-4 ${currentChapter === idx ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800/50 hover:bg-slate-800'}`}>
                                             <span className="text-xs font-black opacity-50">0{idx+1}</span>
@@ -202,6 +266,7 @@
                                             {currentChapter === idx && isPlaying && <div className="w-2 h-2 bg-slate-950 rounded-full animate-ping"></div>}
                                         </button>
                                     ))}
+                                    <button onClick={handleResetKey} className="w-full mt-10 p-4 border border-red-500/30 text-red-400 rounded-2xl text-[10px] font-bold uppercase tracking-widest">Cambiar API Key</button>
                                 </div>
                             </div>
                         )}
@@ -211,28 +276,28 @@
                             <div className="relative w-64 h-64 mb-10 group">
                                 <div className={`absolute inset-0 bg-emerald-500 rounded-[3rem] blur-3xl opacity-20 transition-all duration-1000 ${isPlaying ? 'scale-125 opacity-30' : 'scale-100'}`}></div>
                                 <div className="relative w-full h-full bg-slate-800 rounded-[3.5rem] p-1 border border-slate-700 shadow-2xl overflow-hidden">
-                                    <div className="w-full h-full bg-slate-900 rounded-[3.2rem] flex flex-col items-center justify-center p-8">
+                                    <div className="w-full h-full bg-slate-900 rounded-[3.2rem] flex flex-col items-center justify-center p-8 text-center">
                                         <div className={`mb-6 p-6 rounded-full bg-emerald-500/10 text-emerald-500 ${isPlaying ? 'animate-pulse' : ''}`}>
                                             <i data-lucide={readingMode === 'narrative' ? 'book-open' : 'bar-chart-3'} className="w-16 h-16"></i>
                                         </div>
-                                        <h2 className="text-center text-lg font-black text-white leading-tight mb-2">{chapters[currentChapter].title}</h2>
+                                        <h2 className="text-lg font-black text-white leading-tight mb-2 tracking-tight">{chapters[currentChapter].title}</h2>
                                         <p className="text-[10px] text-emerald-500/80 font-bold tracking-widest uppercase">Modo {readingMode === 'narrative' ? 'Contexto' : 'Estadística'}</p>
                                     </div>
                                     {loading && (
                                         <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center">
                                             <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-                                            <p className="mt-4 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Descargando Voz...</p>
+                                            <p className="mt-4 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Generando Audio...</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Info Box */}
-                            <div className="w-full p-5 bg-slate-800/50 rounded-[2rem] border border-slate-700/50 mb-8 overflow-y-auto max-h-32">
+                            {/* Info Box (Scrollable for high density text) */}
+                            <div className="w-full p-5 bg-slate-800/50 rounded-[2rem] border border-slate-700/50 mb-8 overflow-y-auto max-h-48 custom-scroll">
                                 <div className="flex gap-4 items-start">
-                                    <div className="mt-1"><i data-lucide="info" className="w-4 h-4 text-emerald-500"></i></div>
+                                    <div className="mt-1 shrink-0"><i data-lucide="info" className="w-4 h-4 text-emerald-500"></i></div>
                                     <p className="text-[11px] text-slate-400 leading-relaxed italic">
-                                        "{readingMode === 'narrative' ? chapters[currentChapter].narrative.substring(0, 200) : chapters[currentChapter].data}..."
+                                        {readingMode === 'narrative' ? chapters[currentChapter].narrative : chapters[currentChapter].data}
                                     </p>
                                 </div>
                             </div>
@@ -243,7 +308,7 @@
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex bg-slate-900 p-1 rounded-2xl border border-slate-700">
                                     {[1, 1.25, 1.5].map(s => (
-                                        <button key={s} onClick={() => setPlaybackSpeed(s)} className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${playbackSpeed === s ? 'bg-emerald-500 text-slate-950' : 'text-slate-500'}`}>{s}x</button>
+                                        <button key={s} onClick={() => setPlaybackSpeed(s)} className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${playbackSpeed === s ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/10' : 'text-slate-500 hover:text-white'}`}>{s}x</button>
                                     ))}
                                 </div>
                                 <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
@@ -275,8 +340,9 @@
                         </div>
 
                         {error && (
-                            <div className="absolute top-0 left-0 right-0 bg-red-600 p-3 text-[10px] font-bold text-center z-[100] animate-bounce">
-                                <i data-lucide="alert-circle" className="w-3 h-3 inline mr-2"></i>{error}
+                            <div className="absolute bottom-0 left-0 right-0 bg-red-600 p-4 text-[10px] font-bold text-center z-[100] animate-in slide-in-from-bottom duration-300 flex items-center justify-center gap-2">
+                                <i data-lucide="alert-circle" className="w-4 h-4"></i>
+                                {error}
                             </div>
                         )}
                         
@@ -298,7 +364,8 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
-        setTimeout(() => lucide.createIcons(), 500);
+        // Refresh icons after render
+        setTimeout(() => { if(window.lucide) window.lucide.createIcons(); }, 100);
     </script>
 </body>
 </html>
